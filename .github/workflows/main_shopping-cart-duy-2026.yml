@@ -60,5 +60,7 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'shopping-cart-duy-2026'
+          slot-name: 'production'
           # Lúc này chỉ còn duy nhất 1 file .jar nên sẽ không bị lỗi nữa
           package: '*.jar'
+
