@@ -4,11 +4,9 @@ server:
 spring:
   application:
     name: re-shopping-cart-web-app
-
-  profiles:
-    active: local
-
-spring:
+  
+  # Đã xóa phần profiles active local để chạy được trên server
+  
   datasource:
     url: jdbc:mysql://mysql-20a7862e-hieunguyen369248pro-f49e.j.aivencloud.com:14258/defaultdb?useSSL=true&trustServerCertificate=true&serverTimezone=Asia/Ho_Chi_Minh
     username: avnadmin
@@ -34,4 +32,3 @@ logging:
   level:
     root: INFO
     org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
