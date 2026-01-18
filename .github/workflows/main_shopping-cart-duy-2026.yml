@@ -16,33 +16,26 @@ jobs:
       - name: Set up Java version
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '21' # Bạn đang dùng Java 21
           distribution: 'microsoft'
 
-      - name: Find POM and Build
+      - name: Build with Gradle
         run: |
-          echo "Đang tìm kiếm file pom.xml..."
-          # Lệnh này sẽ tìm file pom.xml ở khắp mọi nơi trong thư mục
-          POM_FILE=$(find . -name "pom.xml" -type f | head -n 1)
-
-          if [ -z "$POM_FILE" ]; then
-            echo "ERROR: KHÔNG TÌM THẤY file pom.xml nào trong toàn bộ dự án!"
-            # In ra cấu trúc thư mục để kiểm tra nếu lỗi
-            echo "Cấu trúc thư mục hiện tại:"
-            find . -maxdepth 3 -not -path '*/.*'
-            exit 1
-          else
-            echo "Đã tìm thấy file POM tại: $POM_FILE"
-            # Chạy lệnh build trên chính file vừa tìm được
-            mvn clean install -f "$POM_FILE" -DskipTests
-          fi
+          # Vào đúng thư mục chứa code
+          cd re-shopping-cart-website-main
+          
+          # Cấp quyền chạy cho file gradlew (Rất quan trọng)
+          chmod +x gradlew
+          
+          # Chạy lệnh build của Gradle (bỏ qua test để chạy nhanh hơn)
+          ./gradlew build -x test
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          # Tìm tất cả file .jar trong thư mục target (bất kể target nằm ở đâu)
-          path: '**/target/*.jar'
+          # Gradle xuất file .jar vào thư mục build/libs chứ không phải target
+          path: 're-shopping-cart-website-main/build/libs/*.jar'
 
   deploy:
     runs-on: ubuntu-latest
