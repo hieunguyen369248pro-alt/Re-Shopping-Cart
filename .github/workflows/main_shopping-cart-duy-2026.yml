@@ -16,25 +16,23 @@ jobs:
       - name: Set up Java version
         uses: actions/setup-java@v4
         with:
-          java-version: '21' # Bạn đang dùng Java 21
+          java-version: '21'
           distribution: 'microsoft'
 
       - name: Build with Gradle
         run: |
-          # Vào đúng thư mục chứa code
           cd re-shopping-cart-website-main
-          
-          # Cấp quyền chạy cho file gradlew (Rất quan trọng)
           chmod +x gradlew
-          
-          # Chạy lệnh build của Gradle (bỏ qua test để chạy nhanh hơn)
           ./gradlew build -x test
+          
+          # Lệnh quan trọng: Xóa file jar "plain" (file thừa) để chỉ giữ lại 1 file chính
+          # Dùng || true để nếu không có file plain thì cũng không báo lỗi
+          rm build/libs/*-plain.jar || true
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          # Gradle xuất file .jar vào thư mục build/libs chứ không phải target
           path: 're-shopping-cart-website-main/build/libs/*.jar'
 
   deploy:
@@ -62,4 +60,5 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'shopping-cart-duy-2026'
+          # Lúc này chỉ còn duy nhất 1 file .jar nên sẽ không bị lỗi nữa
           package: '*.jar'
