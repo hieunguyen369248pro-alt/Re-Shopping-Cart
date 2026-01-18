@@ -19,18 +19,30 @@ jobs:
           java-version: '21'
           distribution: 'microsoft'
 
-      - name: Build with Maven
-        # Lệnh này sẽ tự động tìm và build file pom.xml nằm sâu trong thư mục của bạn
+      - name: Find POM and Build
         run: |
-          cd re-shopping-cart-website-main
-          mvn clean install -DskipTests
+          echo "Đang tìm kiếm file pom.xml..."
+          # Lệnh này sẽ tìm file pom.xml ở khắp mọi nơi trong thư mục
+          POM_FILE=$(find . -name "pom.xml" -type f | head -n 1)
+
+          if [ -z "$POM_FILE" ]; then
+            echo "ERROR: KHÔNG TÌM THẤY file pom.xml nào trong toàn bộ dự án!"
+            # In ra cấu trúc thư mục để kiểm tra nếu lỗi
+            echo "Cấu trúc thư mục hiện tại:"
+            find . -maxdepth 3 -not -path '*/.*'
+            exit 1
+          else
+            echo "Đã tìm thấy file POM tại: $POM_FILE"
+            # Chạy lệnh build trên chính file vừa tìm được
+            mvn clean install -f "$POM_FILE" -DskipTests
+          fi
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          # Thu thập file .jar từ thư mục target bên trong thư mục code của bạn
-          path: 're-shopping-cart-website-main/target/*.jar'
+          # Tìm tất cả file .jar trong thư mục target (bất kể target nằm ở đâu)
+          path: '**/target/*.jar'
 
   deploy:
     runs-on: ubuntu-latest
